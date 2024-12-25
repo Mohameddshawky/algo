@@ -21,26 +21,22 @@ int maxNumberOfContentChildren(vector<int>& g, vector<int>& s){
 }
 int main(){
     int sizeOfG, sizeOfS;
-    cout << "Enter the number of children: ";
     cin>> sizeOfG;
     vector<int>g(sizeOfG);
 
-    cout << "Enter the greed factors of the children: ";
     for (int i = 0; i < sizeOfG; i++) {
         cin >> g[i];
     }
-
-    cout << "Enter the number of cookies: ";
+    
     cin >> sizeOfS;
     vector<int>s(sizeOfS);
 
-    cout << "Enter the sizes of the cookies: ";
     for (int i = 0; i < sizeOfS; i++) {
         cin >> s[i];
     }
 
     int solution = maxNumberOfContentChildren(g,s);
-    cout << "The maximum number of content children is: " << solution << endl;
+    cout<< solution << endl;
 
     return 0;
 }
