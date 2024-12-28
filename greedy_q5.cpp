@@ -1,82 +1,111 @@
+
 #include "bits/stdc++.h"
 using namespace std;
 
-const long long INFIN = 1e18;    //to assign infinity to all vertices at the beginnig 
-const int MAX_Num = 100000;
+const int MAX_NUM = 100000;
 
-struct Edge{
-    int to;
-    long long weight;
-};
 
-vector<Edge>adjVertices[MAX_Num];
-void dijkstra(int source, int n, vector<long long >& distance){
-    distance[source]=0;   // source node
+int N,M;
+int parent[MAX_NUM];
+vector<vector<pair<int, int>>> adjVertices;
+vector<int> visited;
+vector<int> result(200100,0);
 
-    priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>> > pq;
-    pq.push({0, source});
+int findSet(int v){
+    if(parent[v]<0) return v;
 
-    while (!pq.empty()){
-        long long dist = pq.top().first;
-        int u = pq.top().second;
-        pq.pop();
+    return parent[v]= findSet(parent[v]);
+}
 
-        if(dist>distance[u])  //no need to change because it's already smaller
+void unionSets(int x, int y){
+    x=findSet(x);
+    y=findSet(y);
+
+    if(x!=y){
+        if(parent[x]>parent[y])
+            swap(x,y);
+
+        parent[x]+=parent[y];
+        parent[y]=x;
+    }
+
+}
+
+void makeSet(int v){
+    parent[v]=-1;
+}
+
+int DFS(int v){
+    visited[v]=1;
+    int subTreeSize=1;
+
+    for(auto u:adjVertices[v]){
+        if(visited[u.first])
             continue;
 
-        for(const auto& edge : adjVertices[u]){
-            long long w = edge.weight;
-            int v = edge.to;
+        long long subTrees=DFS(u.first);
+        subTreeSize+=subTrees;
 
-            if(distance[u] + w < distance[v]){
-                distance[v] = distance[u] + w;
-                pq.push({distance[v], v});
+        int currentWeight=u.second;
+        long long nodesInteract = subTrees*(N-subTrees);
+        while(nodesInteract>0){
+            if(nodesInteract%2)
+                result[currentWeight]++;
+
+            nodesInteract/=2;
+            if(result[currentWeight]==2){
+                result[currentWeight]=0;
+                nodesInteract++;
             }
+            currentWeight++;
 
         }
     }
-
+    return subTreeSize;
 }
 
 int main(){
-    int N, M;
+    vector<pair<int, pair<int, int> >> edge;
     cin>>N>>M;
-    //build the graph
-    for(int i=0; i<M; i++){
-        int v1, v2, C;
-        long long weight =1;
-        cin>>v1>>v2>>C;
-        v1--;    //to put them in thier right index
-        v2--;
-        for (int j = 0; j < C; j++) {
-            weight*=2;              //2**C
-        }
-        adjVertices[v1].push_back({v2, weight});
-        adjVertices[v2].push_back({v1, weight});
-
+    for (int i = 0; i < M; ++i) {
+        int x,y,c;
+        cin>>x>>y>>c;
+        edge.push_back({c, {x-1, y-1}});
     }
 
-    long long sum =0;
+    adjVertices.resize(N);
+    sort(edge.begin(), edge.end());
+
     for (int i = 0; i < N; ++i) {
-        vector<long long> distance(N, INFIN);
-        dijkstra(i, N, distance);
-        for (int j = i+1; j < N; ++j) {
-            sum+=distance[j];      //the min distance between source and vertix
-        }
+        makeSet(i);
     }
 
-    string sumInBinary = "";
-    while(sum>0){
-        sumInBinary = char('0'+(sum%2) )+sumInBinary;
-        sum/=2;
+    for(auto u : edge){
+        int from = u.second.first;
+        int to = u.second.second;
+        int c = u.first;
+
+        int x = findSet(from);
+        int y = findSet(to);
+
+        if(x==y)
+            continue;
+
+        adjVertices[from].push_back({to, c});
+        adjVertices[to].push_back({from, c});
+        unionSets(from, to);
     }
 
-    if(sumInBinary.empty()){   //the sum is zero
-        sumInBinary="0";
-    }
+    visited=vector<int>(N,0);
+    DFS(0);
 
-    cout<<sumInBinary<<endl;
+    while(result.back()==0){
+        result.pop_back();
+    }
+    reverse(result.begin(), result.end());
+
+    for(auto x : result)
+        cout<<x;
 
     return 0;
 }
-
