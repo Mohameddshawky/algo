@@ -20,11 +20,12 @@ bool isValidPath(int n, vector<vector<int>>edges,int source, int destination){
         vertexAdjacencyList[edge[0]].push_back(edge[1]);
         vertexAdjacencyList[edge[1]].push_back(edge[0]);
     }
-    unordered_set<int> visited;
+    vector<bool> visited;
+    visited.resize(n+1,false);
     //breadth-first search (BFS)
     queue<int> BFS_queue;
     BFS_queue.push(source);
-    visited.insert(source);
+    visited[source] = true;
 
     // Visit all adjacent vertices
     while(!BFS_queue.empty()){
@@ -34,9 +35,9 @@ bool isValidPath(int n, vector<vector<int>>edges,int source, int destination){
         for(int adjVertex : vertexAdjacencyList[vertex]){
             if(adjVertex == destination)
                 return true;
-            if(visited.find(adjVertex) == visited.end()){
+            if(!visited[adjVertex]){
                 BFS_queue.push(adjVertex);
-                visited.insert(adjVertex);
+                visited[adjVertex] = true;
             }
         }
     }
@@ -45,14 +46,14 @@ bool isValidPath(int n, vector<vector<int>>edges,int source, int destination){
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-//    int n = 3;
-//    vector <vector<int>> edges = {{0, 1}, {1, 2}, {2, 0}};
-//    int source = 0;
-//    int destination = 2;
-    int n = 6;
-    vector <vector<int>> edges = {{0, 1}, {0, 2}, {3, 5}, {5, 4}, {4, 3}};
+    int n = 3;
+    vector <vector<int>> edges = {{0, 1}, {1, 2}, {2, 0}};
     int source = 0;
-    int destination = 5;
+    int destination = 2;
+//    int n = 6;
+//    vector <vector<int>> edges = {{0, 1}, {0, 2}, {3, 5}, {5, 4}, {4, 3}};
+//    int source = 0;
+//    int destination = 5;
 
     if (isValidPath(n, edges, source, destination))
         cout<<"true"<<endl;
@@ -60,3 +61,5 @@ int main() {
         cout<<"false"<<endl;
     return 0;
 }
+
+
